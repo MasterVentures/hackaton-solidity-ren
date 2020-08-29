@@ -39,7 +39,25 @@ contract Basic {
         emit Deposit(mintedAmount, _msg, 'BTC');
     }
     
+    function depositBCH(
+        // Parameters from users
+        bytes calldata _msg,
+        // Parameters from Darknodes
+        uint256        _amount,
+        bytes32        _nHash,
+        bytes calldata _sig
+    ) external {
+        bytes32 pHash = keccak256(abi.encode(_msg));
+        uint256 mintedAmount = registry.getGatewayBySymbol("BCH").mint(pHash, _amount, _nHash, _sig);
+        emit Deposit(mintedAmount, _msg, 'BCH');
+    }
+    
     function withdrawBTC(bytes calldata _msg, bytes calldata _to, uint256 _amount) external {
+        uint256 burnedAmount = registry.getGatewayBySymbol("BTC").burn(_to, _amount);
+        emit Withdrawal(_to, burnedAmount, _msg, 'BTC');
+    }
+    
+    function withdrawBCH(bytes calldata _msg, bytes calldata _to, uint256 _amount) external {
         uint256 burnedAmount = registry.getGatewayBySymbol("BTC").burn(_to, _amount);
         emit Withdrawal(_to, burnedAmount, _msg, 'BTC');
     }

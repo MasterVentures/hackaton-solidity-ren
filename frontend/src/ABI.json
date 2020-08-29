@@ -1,5 +1,16 @@
 [
 	{
+		"inputs": [
+			{
+				"internalType": "contract IGatewayRegistry",
+				"name": "_registry",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -58,6 +69,53 @@
 	{
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			}
+		],
+		"name": "balance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "_msg",
+				"type": "bytes"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "_nHash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes",
+				"name": "_sig",
+				"type": "bytes"
+			}
+		],
+		"name": "depositBCH",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "bytes",
 				"name": "_msg",
 				"type": "bytes"
@@ -84,6 +142,42 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "registry",
+		"outputs": [
+			{
+				"internalType": "contract IGatewayRegistry",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "_msg",
+				"type": "bytes"
+			},
+			{
+				"internalType": "bytes",
+				"name": "_to",
+				"type": "bytes"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "withdrawBCH",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "bytes",
@@ -104,49 +198,6 @@
 		"name": "withdrawBTC",
 		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "contract IGatewayRegistry",
-				"name": "_registry",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "symbol",
-				"type": "string"
-			}
-		],
-		"name": "balance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "registry",
-		"outputs": [
-			{
-				"internalType": "contract IGatewayRegistry",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	}
 ]
