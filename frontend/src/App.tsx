@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Web3 from "web3";
 import './App.css';
 import ABI from "./ABI.json";
+import RenJS from "@renproject/ren";
 
 // Finish typings for window
 declare global {
@@ -24,6 +25,7 @@ interface AppState {
   balance: number;
   message: string;
   error: string;
+  renJS: RenJS;
   web3?: Web3
 }
 
@@ -31,6 +33,7 @@ class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     this.state = {
+      renJS: new RenJS("testnet"),
       balance: 0,
       message: "",
       error: "",
@@ -116,13 +119,91 @@ class App extends Component<AppProps, AppState> {
   }
 
   deposit = async () => {
-    this.logError("");
-    // TODO
+    const { web3, renJS } = this.state;
+    const amount = 0.001; // BTC
+
+    if (!web3) return;
+
+    const mint = renJS.lockAndMint({
+      // Send BTC from the Bitcoin blockchain to the Ethereum blockchain.
+      sendToken: RenJS.Tokens.BTC.Btc2Eth,
+
+      // The contract we want to interact with
+      sendTo: contractAddress,
+
+      // The name of the function we want to call
+      contractFn: "depositBTC",
+
+      nonce: renJS.utils.randomNonce(),
+
+      // Arguments expected for calling `deposit`
+      contractParams: [
+        {
+          name: "_msg",
+          type: "bytes",
+          value: web3.utils.fromAscii(`Depositing ${amount} BTC`),
+        }
+      ],
+
+      // Web3 provider for submitting mint to Ethereum
+      web3Provider: web3.currentProvider,
+    });
+
+    // Show the gateway address to the user so that they can transfer their BTC to it.
+    const gatewayAddress = await mint.gatewayAddress();
+    this.log(`Deposit ${amount} BTC to ${gatewayAddress}`);
+
+    // Wait for the Darknodes to detect the BTC transfer.
+    const confirmations = 0;
+    const deposit = await mint.wait(confirmations);
+
+    // Retrieve signature from RenVM.
+    this.log("Submitting to RenVM...");
+    const signature = await deposit.submit();
+
+    // Submit the signature to Ethereum and receive zBTC.
+    this.log("Submitting to smart contract...");
+    await signature.submitToEthereum(web3.currentProvider as any);
+    this.log(`Deposited ${amount} BTC.`);
   }
 
   withdraw = async () => {
-    this.logError("");
-    // TODO
+    const { web3, renJS, balance } = this.state;
+    if (!web3) return;
+
+    const amount = balance;
+    const recipient = prompt("Enter BTC recipient:");
+    if (!recipient) return;
+    const from = (await web3.eth.getAccounts())[0];
+    const contract = new web3.eth.Contract(ABI as any, contractAddress);
+
+    this.log("Calling `withdrawBTC` on smart contract...");
+    const ethereumTxHash: string = await new Promise((resolve, reject) => {
+      contract.methods.withdrawBTC(
+        web3.utils.fromAscii(`Withdrawing ${amount} BTC`), // _msg
+        RenJS.utils.btc.addressToHex(recipient), //_to
+        Math.floor(amount * (10 ** 8)), // _amount in Satoshis
+      ).send({ from })
+        .on("transactionHash", resolve)
+        .catch(reject);
+    });
+
+    this.log(`Retrieving burn event from contract...`);
+    const burn = await renJS.burnAndRelease({
+      // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
+      // This is the reverse of shitIn.
+      sendToken: RenJS.Tokens.BTC.Eth2Btc,
+
+      // The web3 provider to talk to Ethereum
+      web3Provider: web3.currentProvider,
+
+      // The transaction hash of our contract call
+      ethereumTxHash,
+    }).readFromEthereum();
+
+    this.log(`Submitting to Darknodes...`);
+    await burn.submit();
+    this.log(`Withdrew ${amount} BTC to ${recipient}.`);
   }
 }
 
