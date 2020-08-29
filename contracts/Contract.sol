@@ -58,8 +58,8 @@ contract Basic {
     }
     
     function withdrawBCH(bytes calldata _msg, bytes calldata _to, uint256 _amount) external {
-        uint256 burnedAmount = registry.getGatewayBySymbol("BTC").burn(_to, _amount);
-        emit Withdrawal(_to, burnedAmount, _msg, 'BTC');
+        uint256 burnedAmount = registry.getGatewayBySymbol("BCH").burn(_to, _amount);
+        emit Withdrawal(_to, burnedAmount, _msg, 'BCH');
     }
     
     function balance(string calldata symbol) public view returns (uint256) {

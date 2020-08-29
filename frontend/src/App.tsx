@@ -15,7 +15,7 @@ declare global {
 }
 
 // Replace with your contract's address.
-const contractAddress = "0x79D41Af9B3e535925a47F85130146065AFC25352";
+const contractAddress = "0x508ED2ccacBFCa2d034DA04F0f76330C363dcAf4";
 
 interface AppProps {
 
